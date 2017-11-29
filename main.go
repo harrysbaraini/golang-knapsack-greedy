@@ -37,22 +37,21 @@ func (d ItemsSlice) Less(i, j int) bool {
 
 // Função que calcula o Knapsack
 
-func knapsack(maxWeight int, items ItemsSlice) (totalValue int, totalWeight int, selectedItems string) {
+func knapsack(maxWeight int, items ItemsSlice) (totalValue int, totalWeight int, selectedItems []string) {
 	// criamos um array multidimensional do tamanho da quantidade de valores
 	totalWeight = 0
 	totalValue = 0
-	selectedItems = ""
 
 	for i := range items {
 		if totalWeight + items[i].Weight <= maxWeight {
 			totalWeight += items[i].Weight
 			totalValue += items[i].Value
-			selectedItems += items[i].Name + " (" + strconv.Itoa(items[i].Value) + " de " + strconv.Itoa(items[i].Value) + ") | "
+			selectedItems = append(selectedItems, items[i].Name + " (" + strconv.Itoa(items[i].Value) + " de " + strconv.Itoa(items[i].Value) + ") [ratio: " + strconv.Itoa(items[i].Ratio) + "]")
 		} else {
 			remains := maxWeight - totalWeight
 			amount := int(float64(items[i].Value) * (float64(remains) / float64(items[i].Weight)))
 			totalValue += amount
-			selectedItems += items[i].Name + " (" + strconv.Itoa(amount) + " de " + strconv.Itoa(items[i].Value) + ") | "
+			selectedItems = append(selectedItems, items[i].Name + " (" + strconv.Itoa(amount) + " de " + strconv.Itoa(items[i].Value) + ") [ratio: " + strconv.Itoa(items[i].Ratio) + "]")
 			break
 		}
 	}
@@ -79,10 +78,16 @@ func main() {
 
 	sort.Sort(items)
 
-	totalValue, _, selectedItems := knapsack(maxWeight, items)
+	totalValue, totalWeight, selectedItems := knapsack(maxWeight, items)
 
 	fmt.Printf("A lista de valores é %v\n", values)
 	fmt.Printf("A lista de peso é %v\n", weights)
-	fmt.Printf("Os itens selecionados são %s\n", selectedItems)
-	fmt.Printf("Para capacidade %d, O valor máximo é %d\n", maxWeight, totalValue)
+	fmt.Printf("\n-------------------------------------------------------------------------------\n\n")
+	fmt.Printf("Os itens selecionados são: \n\n")
+
+	for i := range selectedItems {
+		fmt.Printf("\t%s\n", selectedItems[i])
+	}
+
+	fmt.Printf("\nPara capacidade %d, O peso total é %d e o valor máximo é %d\n", maxWeight, totalWeight, totalValue)
 }
